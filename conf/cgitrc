@@ -1,0 +1,12 @@
+# cgit Configuration
+virtual-root=/
+scan-path=/var/lib/git
+enable-index-owner=0
+enable-commit-graph=1
+enable-log-filecount=1
+enable-log-linecount=1
+snapshot=tar.gz
+
+# Appearance
+root-title=h3nc4's repositories
+root-desc=h3nc4's personal git repositories

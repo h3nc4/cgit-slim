@@ -1,0 +1,42 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices"],
+  "reviewers": ["h3nc4"],
+  "assignAutomerge": true,
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "packageRules": [
+    {
+      "description": "Auto-merge all minor, patch, pin, and digest updates",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "platformAutomerge": true
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "Update Git version in Dockerfile",
+      "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfile$/"],
+      "matchStrings": ["ARG GIT_VERSION=\"(?<currentValue>.*?)\""],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "git/git"
+    },
+    {
+      "description": "Update libgit2 version in Dockerfile",
+      "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfile$/"],
+      "matchStrings": ["ARG LIBGIT2_VERSION=\"(?<currentValue>.*?)\""],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "libgit2/libgit2"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfile$/"],
+      "matchStrings": ["ARG OPENSSH_VERSION=\"(?<currentValue>.*?)\""],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "openssh/openssh-portable",
+      "extractVersionTemplate": "^V_(?<version>.*)$"
+    }
+  ]
+}

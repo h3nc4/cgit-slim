@@ -1,0 +1,51 @@
+name: Publish Docker Image
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "Dockerfile"
+      - "conf/**"
+      - "src/**"
+      - ".github/workflows/publish-image.yaml"
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - "*Dockerfile"
+      - "conf/**"
+      - "src/**"
+      - ".github/workflows/publish-image.yaml"
+
+jobs:
+  build-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run actions/checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Run docker/setup-buildx-action
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Run docker/login-action
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get short SHA
+        id: sha
+        run: echo "short=${GITHUB_SHA::7}" >>${GITHUB_OUTPUT}
+
+      - name: Run docker/build-push-action
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}:${{ steps.sha.outputs.short }}
