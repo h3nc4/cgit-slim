@@ -20,23 +20,33 @@
       "managerFilePatterns": ["/^Dockerfile$/"],
       "matchStrings": ["ARG GIT_VERSION=\"(?<currentValue>.*?)\""],
       "datasourceTemplate": "github-tags",
-      "depNameTemplate": "git/git"
+      "depNameTemplate": "git/git",
+      "extractVersionTemplate": "^v(?<version>.*)$"
     },
     {
-      "description": "Update libgit2 version in Dockerfile",
-      "customType": "regex",
-      "managerFilePatterns": ["/^Dockerfile$/"],
-      "matchStrings": ["ARG LIBGIT2_VERSION=\"(?<currentValue>.*?)\""],
-      "datasourceTemplate": "github-tags",
-      "depNameTemplate": "libgit2/libgit2"
-    },
-    {
+      "description": "Update OpenSSH version in Dockerfile",
       "customType": "regex",
       "managerFilePatterns": ["/^Dockerfile$/"],
       "matchStrings": ["ARG OPENSSH_VERSION=\"(?<currentValue>.*?)\""],
+      "datasourceTemplate": "repology",
+      "depNameTemplate": "openssh"
+    },
+    {
+      "description": "Update fcgiwrap version in Dockerfile",
+      "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfile$/"],
+      "matchStrings": ["ARG FCGIWRAP_VERSION=\"(?<currentValue>.*?)\""],
       "datasourceTemplate": "github-tags",
-      "depNameTemplate": "openssh/openssh-portable",
-      "extractVersionTemplate": "^V_(?<version>.*)$"
+      "depNameTemplate": "gnosek/fcgiwrap"
+    },
+    {
+      "description": "Update cgit version in Dockerfile",
+      "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfile$/"],
+      "matchStrings": ["ARG CGIT_VERSION=\"(?<currentValue>.*?)\""],
+      "datasourceTemplate": "git-refs",
+      "lookupNameTemplate": "https://git.zx2c4.com/cgit",
+      "depNameTemplate": "cgit"
     }
   ]
 }

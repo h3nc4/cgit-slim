@@ -18,7 +18,6 @@
 
 ARG CGIT_VERSION="09d24d7cd0b7e85633f2f43808b12871bb209d69"
 ARG GIT_VERSION="2.52.0"
-ARG TINI_VERSION="v0.19.0"
 ARG FCGIWRAP_VERSION="1.1.0"
 ARG OPENSSH_VERSION="9.9p1"
 
@@ -93,11 +92,12 @@ RUN mkdir -p /rootfs/${CGIT_ROOT} /rootfs/bin && \
 ################################################################################
 # fcgiwrap Build Stage
 FROM autotools-base AS fcgiwrap-builder
+ARG FCGIWRAP_VERSION
 
 RUN apk add fcgi-dev
 
 WORKDIR /build
-RUN git clone https://github.com/gnosek/fcgiwrap.git
+RUN git clone -b "${FCGIWRAP_VERSION}" --depth 1 https://github.com/gnosek/fcgiwrap.git
 WORKDIR /build/fcgiwrap
 # Force static link of libfcgi
 RUN autoreconf -i && \
