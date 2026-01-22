@@ -153,9 +153,9 @@ RUN mkdir -p /rootfs/bin /rootfs/libexec/git-core && \
 ################################################################################
 # Helpers Build Stage
 FROM base AS helpers-builder
-COPY src /src
-RUN gcc -static -O2 -o /init /src/init.c && \
-  gcc -static -O2 -o /mirror-sync /src/sync.c
+COPY init.c sync.c ./
+RUN gcc -static -O2 -o /init ./init.c && \
+  gcc -static -O2 -o /mirror-sync ./sync.c
 
 ################################################################################
 # Nginx Stage
@@ -198,8 +198,8 @@ COPY --from=base /etc/ssl/certs/ca-certificates.crt /rootfs/etc/ssl/certs/ca-cer
 # Configuration and binaries
 COPY --from=helpers-builder /init /rootfs/bin/init
 COPY --from=helpers-builder /mirror-sync /rootfs/bin/mirror-sync
-COPY conf/cgitrc /rootfs/etc/cgitrc
-COPY conf/nginx.conf /rootfs/etc/nginx.conf
+COPY ./cgitrc /rootfs/etc/cgitrc
+COPY ./nginx.conf /rootfs/etc/nginx.conf
 
 RUN chown -R "${USER}:${GROUP}" /rootfs/run /rootfs/var/lib/git /rootfs/${CGIT_ROOT} /rootfs/run /rootfs/tmp
 
