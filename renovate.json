@@ -1,14 +1,23 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices"],
-  "reviewers": ["h3nc4"],
+  "extends": [
+    "config:best-practices"
+  ],
+  "reviewers": [
+    "h3nc4"
+  ],
   "assignAutomerge": true,
   "prConcurrentLimit": 0,
   "prHourlyLimit": 0,
   "packageRules": [
     {
       "description": "Auto-merge all minor, patch, pin, and digest updates",
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
       "automerge": true,
       "platformAutomerge": true
     }
@@ -17,8 +26,12 @@
     {
       "description": "Update Git version in Dockerfile",
       "customType": "regex",
-      "managerFilePatterns": ["/^Dockerfile$/"],
-      "matchStrings": ["ARG GIT_VERSION=\"(?<currentValue>.*?)\""],
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG GIT_VERSION=\"(?<currentValue>.*?)\""
+      ],
       "datasourceTemplate": "github-tags",
       "depNameTemplate": "git/git",
       "extractVersionTemplate": "^v(?<version>.*)$"
@@ -26,8 +39,12 @@
     {
       "description": "Update OpenSSH version in Dockerfile",
       "customType": "regex",
-      "managerFilePatterns": ["/^Dockerfile$/"],
-      "matchStrings": ["ARG OPENSSH_VERSION=\"(?<currentValue>.*?)\""],
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG OPENSSH_VERSION=\"(?<currentValue>.*?)\""
+      ],
       "datasourceTemplate": "repology",
       "depNameTemplate": "nix_unstable/openssh",
       "versioningTemplate": "loose"
@@ -35,18 +52,26 @@
     {
       "description": "Update fcgiwrap version in Dockerfile",
       "customType": "regex",
-      "managerFilePatterns": ["/^Dockerfile$/"],
-      "matchStrings": ["ARG FCGIWRAP_VERSION=\"(?<currentValue>.*?)\""],
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG FCGIWRAP_VERSION=\"(?<currentValue>.*?)\""
+      ],
       "datasourceTemplate": "github-tags",
       "depNameTemplate": "gnosek/fcgiwrap"
     },
     {
       "description": "Update cgit version in Dockerfile",
       "customType": "regex",
-      "managerFilePatterns": ["/^Dockerfile$/"],
-      "matchStrings": ["ARG CGIT_VERSION=\"(?<currentValue>.*?)\""],
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG CGIT_VERSION=\"(?<currentValue>.*?)\""
+      ],
       "datasourceTemplate": "git-refs",
-      "lookupNameTemplate": "https://git.zx2c4.com/cgit",
+      "packageNameTemplate": "https://git.zx2c4.com/cgit",
       "depNameTemplate": "cgit"
     }
   ]
