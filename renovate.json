@@ -29,7 +29,8 @@
       "managerFilePatterns": ["/^Dockerfile$/"],
       "matchStrings": ["ARG OPENSSH_VERSION=\"(?<currentValue>.*?)\""],
       "datasourceTemplate": "repology",
-      "depNameTemplate": "openssh"
+      "depNameTemplate": "nix_unstable/openssh",
+      "versioningTemplate": "loose"
     },
     {
       "description": "Update fcgiwrap version in Dockerfile",
