@@ -18,7 +18,7 @@
 
 ARG CGIT_VERSION="09d24d7cd0b7e85633f2f43808b12871bb209d69"
 ARG GIT_VERSION="2.52.0"
-ARG FCGIWRAP_VERSION="1.1.0"
+ARG FCGIWRAP_VERSION="99c942c90063c73734e56bacaa65f947772d9186"
 ARG OPENSSH_VERSION="10.2p1"
 
 ARG USER="1000"
@@ -32,6 +32,7 @@ FROM alpine:3.23@sha256:865b95f46d98cf867a156fe4a135ad3fe50d2056aa3f25ed31662dff
 
 RUN apk add \
   build-base \
+  gnupg \
   openssl-dev \
   openssl-libs-static \
   zlib-dev \
@@ -72,14 +73,26 @@ FROM git-base AS cgit-builder
 ARG CGIT_VERSION
 ARG CGIT_ROOT
 
-RUN apk add curl
+RUN apk add curl git
 
 WORKDIR /build
-ADD "https://git.zx2c4.com/cgit/snapshot/cgit-${CGIT_VERSION}.tar.xz" "/build/cgit.tar.xz"
-RUN tar -xf /build/cgit.tar.xz
+RUN git clone --branch master --depth 1 https://git.zx2c4.com/cgit cgit-${CGIT_VERSION} && \
+  cd cgit-${CGIT_VERSION} && \
+  git checkout ${CGIT_VERSION}
 
 WORKDIR /build/cgit-${CGIT_VERSION}
-RUN make get-git
+
+RUN GIT_VERSION=$(sed -n 's/^GIT_VER *= *\([0-9.]\+\)/\1/p' Makefile) && \
+  wget -qO "git-${GIT_VERSION}.tar.xz" "https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.xz" && \
+  wget -qO "git-${GIT_VERSION}.tar.sign" "https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.sign" && \
+  wget -qO "/junio.asc" "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE1F036B1FEE7221FC778ECEFB0B5E88696AFE6CB"
+
+RUN gpg --import /junio.asc && \
+  unxz git-*.tar.xz && \
+  gpg --verify git-*.tar.sign git-*.tar
+
+RUN GIT_VERSION=$(sed -n 's/^GIT_VER *= *\([0-9.]\+\)/\1/p' Makefile) && \
+  tar -xf "git-${GIT_VERSION}.tar" -C ./git --strip-components=1
 
 RUN make LDFLAGS="-static" \
   EXTLIBS="-lnghttp2 -lssl -lcrypto -lz -lbrotlidec -lbrotlicommon -lzstd -lpsl -lidn2 -lunistring -lcares" \
@@ -94,11 +107,11 @@ RUN mkdir -p /rootfs/${CGIT_ROOT} /rootfs/bin && \
 FROM autotools-base AS fcgiwrap-builder
 ARG FCGIWRAP_VERSION
 
-RUN apk add fcgi-dev
+RUN apk add fcgi-dev git
 
-WORKDIR /build
-RUN git clone -b "${FCGIWRAP_VERSION}" --depth 1 https://github.com/gnosek/fcgiwrap.git
 WORKDIR /build/fcgiwrap
+RUN git clone --branch master --depth 1 https://github.com/gnosek/fcgiwrap.git . && \
+  git checkout ${FCGIWRAP_VERSION}
 # Force static link of libfcgi
 RUN autoreconf -i && \
   ./configure LDFLAGS="-static" && \
@@ -117,6 +130,12 @@ RUN apk add \
   ncurses-static
 
 ADD "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VERSION}.tar.gz" .
+ADD "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VERSION}.tar.gz.asc" .
+ADD "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x7168B983815A5EEF59A4ADFD2A3F414E736060BA" "/openssh.asc"
+
+RUN gpg --import /openssh.asc && \
+  gpg --verify "openssh-${OPENSSH_VERSION}.tar.gz.asc" "openssh-${OPENSSH_VERSION}.tar.gz"
+
 RUN tar -xzf "openssh-${OPENSSH_VERSION}.tar.gz" && \
   cd "openssh-${OPENSSH_VERSION}" && \
   ./configure --enable-static --without-pie \
@@ -135,8 +154,15 @@ ARG GIT_VERSION
 
 RUN apk add linux-headers
 
-ADD "https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.xz" "git.tar.xz"
-RUN tar -xf git.tar.xz && \
+ADD "https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.xz" "git-${GIT_VERSION}.tar.xz"
+ADD "https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.sign" "git-${GIT_VERSION}.tar.sign"
+ADD "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE1F036B1FEE7221FC778ECEFB0B5E88696AFE6CB" "/junio.asc"
+
+RUN gpg --import /junio.asc && \
+  unxz "git-${GIT_VERSION}.tar.xz" && \
+  gpg --verify "git-${GIT_VERSION}.tar.sign" "git-${GIT_VERSION}.tar"
+
+RUN tar -xf git-${GIT_VERSION}.tar && \
   cd git-${GIT_VERSION} && \
   export LIBS="$(pkg-config --static --libs libcurl expat openssl)" && \
   ./configure LDFLAGS="-static" \
