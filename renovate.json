@@ -58,8 +58,9 @@
       "matchStrings": [
         "ARG FCGIWRAP_VERSION=\"(?<currentValue>.*?)\""
       ],
-      "datasourceTemplate": "github-tags",
-      "depNameTemplate": "gnosek/fcgiwrap"
+      "datasourceTemplate": "git-refs",
+      "packageNameTemplate": "https://github.com/gnosek/fcgiwrap",
+      "depNameTemplate": "fcgiwrap"
     },
     {
       "description": "Update cgit version in Dockerfile",
