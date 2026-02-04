@@ -185,7 +185,7 @@ RUN gcc -static -O2 -o /init ./init.c && \
 
 ################################################################################
 # Nginx Stage
-FROM h3nc4/nginx-slim:latest@sha256:d3d3fa512793df698a712cbd22fb56b54e2a01cd4b59efeca40929b2aea72e88 AS nginx
+FROM h3nc4/nginx-slim:latest@sha256:0853a4a1115409f41cbe195cc8741d90068a37126bd3458d5ba76b9c348e8ae0 AS nginx
 
 ################################################################################
 # Assemble Root Filesystem
