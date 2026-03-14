@@ -16,7 +16,7 @@
 
 ################################################################################
 
-ARG CGIT_VERSION="09d24d7cd0b7e85633f2f43808b12871bb209d69"
+ARG CGIT_VERSION="1.3"
 ARG GIT_VERSION="2.53.0"
 ARG FCGIWRAP_VERSION="99c942c90063c73734e56bacaa65f947772d9186"
 ARG OPENSSH_VERSION="10.2p1"
@@ -73,12 +73,17 @@ FROM git-base AS cgit-builder
 ARG CGIT_VERSION
 ARG CGIT_ROOT
 
-RUN apk add curl git
-
 WORKDIR /build
-RUN git clone --branch master --depth 1 https://git.zx2c4.com/cgit cgit-${CGIT_VERSION} && \
-  cd cgit-${CGIT_VERSION} && \
-  git checkout ${CGIT_VERSION}
+ADD "https://git.zx2c4.com/cgit/snapshot/cgit-${CGIT_VERSION}.tar.xz" "cgit-${CGIT_VERSION}.tar.xz"
+ADD "https://git.zx2c4.com/cgit/snapshot/cgit-${CGIT_VERSION}.tar.asc" "cgit-${CGIT_VERSION}.tar.asc"
+ADD "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xAB9942E6D4A4CFC3412620A749FC7012A5DE03AE" "/cgit.asc"
+
+RUN gpg --import /cgit.asc && \
+  unxz cgit-${CGIT_VERSION}.tar.xz && \
+  gpg --verify cgit-${CGIT_VERSION}.tar.asc cgit-${CGIT_VERSION}.tar
+
+RUN mkdir -p cgit-${CGIT_VERSION} && \
+  tar -xf cgit-${CGIT_VERSION}.tar -C cgit-${CGIT_VERSION} --strip-components=1
 
 WORKDIR /build/cgit-${CGIT_VERSION}
 
