@@ -17,7 +17,7 @@
 ################################################################################
 
 ARG CGIT_VERSION="1.3"
-ARG GIT_VERSION="2.53.0"
+ARG GIT_VERSION="2.54.0"
 ARG FCGIWRAP_VERSION="99c942c90063c73734e56bacaa65f947772d9186"
 ARG OPENSSH_VERSION="10.2p1"
 
