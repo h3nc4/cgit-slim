@@ -6,16 +6,20 @@ on:
       - "main"
     paths:
       - "Dockerfile"
-      - "conf/**"
-      - "src/**"
+      - "cgitrc"
+      - "nginx.conf"
+      - "*.c"
+      - "scripts/**"
       - ".github/workflows/publish-image.yaml"
   pull_request:
     branches:
       - "main"
     paths:
-      - "*Dockerfile"
-      - "conf/**"
-      - "src/**"
+      - "Dockerfile"
+      - "cgitrc"
+      - "nginx.conf"
+      - "*.c"
+      - "scripts/**"
       - ".github/workflows/publish-image.yaml"
 
 jobs:
@@ -38,10 +42,23 @@ jobs:
 
       - name: Get short SHA
         id: sha
-        run: echo "short=${GITHUB_SHA::7}" >>${GITHUB_OUTPUT}
+        run: echo "short=${GITHUB_SHA::7}" >>"${GITHUB_OUTPUT}"
 
       - name: Name the published image
         run: echo "IMAGE=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')" >>"${GITHUB_ENV}"
+
+      - name: Build the image locally
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          tags: ${{ env.IMAGE }}:smoke
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run scripts/smoke-test.sh
+        run: ./scripts/smoke-test.sh "${IMAGE}:smoke"
 
       - name: Run docker/build-push-action
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
@@ -52,3 +69,4 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:${{ steps.sha.outputs.short }}
+          cache-from: type=gha
