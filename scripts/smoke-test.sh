@@ -31,12 +31,13 @@ cid=""
 cleanup() {
   set +e
   if [ -n "${cid}" ]; then
-    docker rm -f "${cid}" >/dev/null
+    docker rm -f "${cid}" >/dev/null 2>&1
   fi
   rm -rf "${work}"
 }
 trap cleanup EXIT INT TERM
 
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
 export GIT_AUTHOR_NAME=h3nc4 GIT_AUTHOR_EMAIL=me@h3nc4.com
 export GIT_COMMITTER_NAME="${GIT_AUTHOR_NAME}" GIT_COMMITTER_EMAIL="${GIT_AUTHOR_EMAIL}"
 
