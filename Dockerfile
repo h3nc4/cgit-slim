@@ -73,19 +73,18 @@ FROM git-base AS cgit-builder
 ARG CGIT_VERSION
 ARG CGIT_ROOT
 
+RUN apk add git
+
 WORKDIR /build
-ADD "https://git.zx2c4.com/cgit/snapshot/cgit-${CGIT_VERSION}.tar.xz" "cgit-${CGIT_VERSION}.tar.xz"
-ADD "https://git.zx2c4.com/cgit/snapshot/cgit-${CGIT_VERSION}.tar.asc" "cgit-${CGIT_VERSION}.tar.asc"
 ADD "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xAB9942E6D4A4CFC3412620A749FC7012A5DE03AE" "/cgit.asc"
 
-RUN gpg --import /cgit.asc && \
-  unxz cgit-${CGIT_VERSION}.tar.xz && \
-  gpg --verify cgit-${CGIT_VERSION}.tar.asc cgit-${CGIT_VERSION}.tar
-
-RUN mkdir -p cgit-${CGIT_VERSION} && \
-  tar -xf cgit-${CGIT_VERSION}.tar -C cgit-${CGIT_VERSION} --strip-components=1
+RUN git clone --depth 1 --branch "v${CGIT_VERSION}" \
+  https://git.zx2c4.com/cgit "cgit-${CGIT_VERSION}"
 
 WORKDIR /build/cgit-${CGIT_VERSION}
+
+RUN gpg --import /cgit.asc && \
+  git verify-tag "v${CGIT_VERSION}"
 
 RUN GIT_VERSION=$(sed -n 's/^GIT_VER *= *\([0-9.]\+\)/\1/p' Makefile) && \
   wget -qO "git-${GIT_VERSION}.tar.xz" "https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.xz" && \
@@ -174,8 +173,9 @@ RUN tar -xf git-${GIT_VERSION}.tar && \
   --without-tcltk --without-python --with-curl --with-openssl --with-expat && \
   make LDFLAGS="-static" \
   EXTLIBS="$LIBS" \
+  NO_RUST=YesPlease \
   -j$(nproc) && \
-  make install
+  make install NO_RUST=YesPlease
 
 RUN mkdir -p /rootfs/bin /rootfs/libexec/git-core && \
   cp /usr/local/bin/git /rootfs/bin/git && \
