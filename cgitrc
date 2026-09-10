@@ -10,3 +10,7 @@ snapshot=tar.gz
 # Appearance
 root-title=h3nc4's repositories
 root-desc=h3nc4's personal git repositories
+logo=/banner.png
+logo-link=/
+favicon=/favicon.ico
+head-include=/etc/cgit-head.html
