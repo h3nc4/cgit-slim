@@ -231,6 +231,10 @@ COPY --from=helpers-builder /init /rootfs/bin/init
 COPY --from=helpers-builder /mirror-sync /rootfs/bin/mirror-sync
 COPY ./cgitrc /rootfs/etc/cgitrc
 COPY ./nginx.conf /rootfs/etc/nginx.conf
+# After the cgit stage above, so this favicon.ico replaces the one cgit ships.
+COPY ./assets/ /rootfs/${CGIT_ROOT}/
+# cgit emits no link preview tags of its own, so head-include supplies them.
+COPY ./head.html /rootfs/etc/cgit-head.html
 
 RUN chown -R "${USER}:${GROUP}" /rootfs/run /rootfs/var/lib/git /rootfs/${CGIT_ROOT} /rootfs/run /rootfs/tmp
 
