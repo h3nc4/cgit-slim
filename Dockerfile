@@ -28,7 +28,7 @@ ARG CGIT_ROOT="/var/www/cgit"
 
 ################################################################################
 # Base Build Stage
-FROM alpine:3.24@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS base
+FROM alpine:3.24@sha256:e7c4abb69531cb09e2a2bbb56fad3367ab694865c49df898c1c683185cc4376c AS base
 
 RUN apk add \
   build-base \
@@ -194,7 +194,7 @@ FROM h3nc4/nginx-slim:latest@sha256:9b43e9782b2468516725086f01344e7aa19b71e437c8
 
 ################################################################################
 # Assemble Root Filesystem
-FROM alpine:3.24@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS rootfs-builder
+FROM alpine:3.24@sha256:e7c4abb69531cb09e2a2bbb56fad3367ab694865c49df898c1c683185cc4376c AS rootfs-builder
 ARG CGIT_VERSION
 ARG CGIT_ROOT
 ARG USER
