@@ -21,7 +21,7 @@ on:
       - "nginx.conf"
       - "*.c"
       - "scripts/**"
-      - ".github/workflows/publish-image.yaml"
+      - ".github/workflows/**"
 
 jobs:
   build-push:
